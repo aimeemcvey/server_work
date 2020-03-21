@@ -1,21 +1,38 @@
 # blood_match.py
-
 import requests
 
-student = {"name": "Aimee McVey", "net_id": "ajm111", "e-mail": "aimee.mcvey@duke.edu"}
-# s = requests.post("http://vcm-7631.vm.duke.edu:5001/student", json=student)
-# if s.status_code == 200:
-#     print(s.json())
-# else:
-#     print("Error with status code of {}" .format(s.status_code))
+p = requests.get("http://vcm-7631.vm.duke.edu:5002/get_patients/ajm111")
+patient_list = p.json()
 
-r = requests.get("http://vcm-7631.vm.duke.edu:5001/list")
-student_list = r.json()
-print(student_list)
+b_donor = requests.get("http://vcm-7631.vm.duke.edu:5002/get_blood_type/{}".format(patient_list["Donor"]))
+b_recipient = requests.get("http://vcm-7631.vm.duke.edu:5002/get_blood_type/{}".format(patient_list["Recipient"]))
+print(b_donor.text)
+print(b_recipient.text)
 
-numbers = {"a": 6, "b": 2}
-n = requests.post("http://vcm-7631.vm.duke.edu:5001/sum", json=numbers)
-if n.status_code == 200:
-    print("The sum is {}." .format(n.json()))
+if b_donor.text == "O-" or b_donor.text == "O+":
+    compatible = "Yes"
+if b_donor.text == "A-" or b_donor.text == "A+":
+    if b_recipient.text == "A-" or b_recipient.text == "A+" or b_recipient.text == "AB+" or b_recipient.text == "AB-":
+        compatible = "Yes"
+    else:
+        compatible = "No"
+if b_donor.text == "B-" or b_donor.text == "B+":
+    if b_recipient.text == "B-" or b_recipient.text == "B+" or b_recipient.text == "AB+" or b_recipient.text == "AB-":
+        compatible = "Yes"
+    else:
+        compatible = "No"
+if b_donor.text == "AB-" or b_donor.text == "AB+":
+    if b_recipient.text == "AB+" or b_recipient.text == "AB-":
+        compatible = "Yes"
+    else:
+        compatible = "No"
+
+print(compatible)
+
+match = {"Name": "ajm111", "Match": compatible}
+m = requests.post("http://vcm-7631.vm.duke.edu:5002/match_check", json=match)
+if m.status_code == 200:
+    print("You are {}." .format(m.text))
 else:
-    print("Error with status code of {}" .format(n.status_code))
+    print("Error with status code of {}" .format(m.status_code))
+
