@@ -44,14 +44,18 @@ def calculate_age():
 
 @app.route("/until_next_meal/<meal>", methods=["GET"])
 def meal_time(meal):
-    dt = datetime.now()
-    time = datetime.strftime(dt, "%H:%M:%S")
+    t = datetime.now()
     if meal == 'breakfast':
-        bfast_time = '09:00:00'
+        bfast_time = datetime(2020, 3, 24, 9, 0, 0)
+        diff = bfast_time - t
     if meal == 'lunch':
-        lunch_time = '13:00:00'
+        lunch_time = datetime(2020, 3, 24, 13, 0, 0)
+        diff = lunch_time - t
     if meal == 'dinner':
-        dinner_time = '18:30:00'
+        dinner_time = datetime(2020, 3, 24, 18, 30, 0)
+        diff = dinner_time - t
+    hours = round(diff.seconds/3600)
+    return "{} hours until {}".format(hours, meal)
 
 
 if __name__ == "__main__":
